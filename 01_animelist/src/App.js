@@ -15,7 +15,7 @@ function App() {
                 setResults([...data.results]);
             })
             .catch((error) => {
-                alert("yoo error");
+                alert("Error while fetching data, check console");
                 console.log(error);
             });
     };
