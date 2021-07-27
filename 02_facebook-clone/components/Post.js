@@ -1,5 +1,6 @@
 import React from "react";
 import Image from "next/image";
+import { ChatAltIcon, ShareIcon, ThumbUpIcon } from "@heroicons/react/outline";
 
 function Post({ name, message, image, postImage, timestamp }) {
     return (
@@ -34,6 +35,21 @@ function Post({ name, message, image, postImage, timestamp }) {
                     />
                 </div>
             )}
+
+            <div className="flex justify-between items-center rounded-b-2xl bg-white shadow-md text-gray-400 border-t">
+                <div className="flex space-x-2 inputIcon rounded-none">
+                    <ThumbUpIcon className="h-4" />
+                    <p className="text-xs sm:text-base">Like</p>
+                </div>
+                <div className="flex space-x-2 inputIcon rounded-none">
+                    <ChatAltIcon className="h-4" />
+                    <p className="text-xs sm:text-base">Like</p>
+                </div>
+                <div className="flex space-x-2 inputIcon rounded-none">
+                    <ShareIcon className="h-4" />
+                    <p className="text-xs sm:text-base">Share</p>
+                </div>
+            </div>
         </div>
     );
 }

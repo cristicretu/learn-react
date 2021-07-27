@@ -19,7 +19,7 @@ function StoryCard({ name, src, profile, key }) {
                 src={src}
                 layout="fill"
             />
-            <h1 className="absolute bottom-0 text-white py-4 px-2 font-semibold left-0">
+            <h1 className="absolute bottom-0 hidden lg:inline-flex text-white py-4 px-2 font-semibold left-0">
                 {name}
             </h1>
         </div>
