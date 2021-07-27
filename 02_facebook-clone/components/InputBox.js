@@ -4,27 +4,75 @@ import Image from "next/image";
 import { EmojiHappyIcon } from "@heroicons/react/solid";
 import { CameraIcon, VideoCameraIcon } from "@heroicons/react/solid";
 
-import { useRef } from "react";
-import { db } from "../firebase";
+import { useRef, useState } from "react";
+import { db, storage } from "../firebase";
 import firebase from "firebase";
 
 function InputBox() {
     const [session] = useSession();
     const inputRef = useRef(null);
+    const filePickerRef = useRef(null);
+    const [ImageToPost, setImageToPost] = useState(null);
+
     const sendPost = (e) => {
         e.preventDefault();
 
         if (!inputRef.current.value) return;
 
-        db.collection("posts").add({
-            message: inputRef.current.value,
-            name: session.user.name,
-            email: session.user.email,
-            image: session.user.image,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-        });
+        db.collection("posts")
+            .add({
+                message: inputRef.current.value,
+                name: session.user.name,
+                email: session.user.email,
+                image: session.user.image,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            })
+            .then((doc) => {
+                if (ImageToPost) {
+                    const uploadTask = storage
+                        .ref(`posts/${doc.id}`)
+                        .putString(ImageToPost, "data_url");
+
+                    removeImage();
+
+                    uploadTask.on(
+                        "state_change",
+                        null,
+                        (error) => console.log(error),
+                        () => {
+                            storage
+                                .ref(`posts`)
+                                .child(doc.id)
+                                .getDownloadURL()
+                                .then((url) => {
+                                    db.collection("posts").doc(doc.id).set(
+                                        {
+                                            postImage: url,
+                                        },
+                                        { merge: true }
+                                    );
+                                });
+                        }
+                    );
+                }
+            });
 
         inputRef.current.value = "";
+    };
+
+    const addImageToPost = (e) => {
+        const reader = new FileReader();
+        if (e.target.files[0]) {
+            reader.readAsDataURL(e.target.files[0]);
+        }
+
+        reader.onload = (readerEvent) => {
+            setImageToPost(readerEvent.target.result);
+        };
+    };
+
+    const removeImage = () => {
+        setImageToPost(null);
     };
 
     return (
@@ -50,6 +98,22 @@ function InputBox() {
                         Submit
                     </button>
                 </form>
+
+                {ImageToPost && (
+                    <div
+                        onClick={removeImage}
+                        className="flex flex-col filter hover:brightness-110 transition duration-150 transform hover:scale-105 cursor-pointer"
+                    >
+                        <img
+                            src={ImageToPost}
+                            alt=""
+                            className="h-10 object-contain"
+                        />
+                        <p className="text-xs text-center text-red-600">
+                            Remove
+                        </p>
+                    </div>
+                )}
             </div>
 
             <div className="flex justify-evenly p-3 border-t">
@@ -59,11 +123,20 @@ function InputBox() {
                         Live video
                     </p>
                 </div>
-                <div className="flex inputIcon">
+                <div
+                    onClick={() => filePickerRef.current.click()}
+                    className="flex inputIcon"
+                >
                     <CameraIcon className="h-7 text-green-500"></CameraIcon>
                     <p className="text-xs sm:text-sm xl:text-base">
                         Photo/Video
                     </p>
+                    <input
+                        ref={filePickerRef}
+                        onChange={addImageToPost}
+                        type="file"
+                        hidden
+                    />
                 </div>
                 <div className="flex inputIcon">
                     <EmojiHappyIcon className="h-7 text-yellow-700"></EmojiHappyIcon>

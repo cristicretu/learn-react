@@ -2,7 +2,7 @@ import StoryCard from "./StoryCard";
 
 const storyData = [
     {
-        name: "Cristi Cretu",
+        name: "Lionel Messi",
         src: "https://links.papareact.com/zof",
         profile: "https://links.papareact.com/l4v",
     },
