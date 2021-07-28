@@ -32,7 +32,7 @@ function App() {
 
     useEffect(() => {
         fetchData();
-    }, []);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <div className="flex flex-col items-center my-6 justify-center space-y-8 max-w-4xl mx-auto">
