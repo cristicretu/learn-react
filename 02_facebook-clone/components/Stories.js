@@ -3,8 +3,8 @@ import StoryCard from "./StoryCard";
 const storyData = [
     {
         name: "Lionel Messi",
-        src: "https://links.papareact.com/zof",
-        profile: "https://links.papareact.com/l4v",
+        src: "https://links.papareact.com/4zn",
+        profile: "https://links.papareact.com/kxk",
     },
     {
         name: "Elon Musk",
