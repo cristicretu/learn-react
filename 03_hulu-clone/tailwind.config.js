@@ -579,6 +579,9 @@ module.exports = {
                 128: "32rem",
                 144: "36rem",
             },
+            screens: {
+                "3xl": "2000px",
+            },
             borderRadius: {
                 "4xl": "2rem",
             },
