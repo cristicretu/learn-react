@@ -11,6 +11,7 @@ export default function Thumbnail({ result }) {
                         result.backdrop_path || result.poster_path
                     }` || `${BASE_URL}${result.poster_path}`
                 }
+                className="rounded-md"
                 height={1080}
                 width={1920}
             />
