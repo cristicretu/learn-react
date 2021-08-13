@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
+
 export interface Task {
     title: string;
     description?: string;
-    date: Date;
+    date: string;
     points: number;
     isCompleted: boolean;
 }
@@ -18,33 +19,34 @@ function App() {
 
     const [todos, setTodos] = useState<Array<Task>>([]);
 
-    // TODO ADD LOCALSTORAGE
-    // useEffect(() => {
-    //     const existingTodos = localStorage.getItem("todos");
-    //     // setTodos(existingTodos ? JSON.parse(existingTodos) : "");
-    //     if (existingTodos) console.log(JSON.parse(existingTodos));
-    // }, [todos]);
+    useEffect(() => {
+        const existingTodos = localStorage.getItem("todos");
+        if (existingTodos == null) {
+            return;
+        }
+        // setTodos(existingTodos ? JSON.parse(existingTodos) : "");
+        const todosList = JSON.parse(existingTodos);
+        setTodos((prevState) => [...prevState, ...todosList]);
+    }, []);
 
     const handleSubmit = () => {
         if (title.length < 1) {
             setWarning("Title is mandatory, please use a title for your todo!");
             return;
+        } else {
+            setWarning("");
         }
 
-        const newTask = [
-            ...todos,
-            {
-                title: title,
-                date: startDate,
-                points: points,
-                isCompleted: false,
-                description: descr,
-            },
-        ];
+        const newTodo = {
+            title: title,
+            date: startDate.toISOString(),
+            points: points,
+            isCompleted: false,
+            description: descr,
+        };
 
-        setTodos(newTask);
-        // localStorage.setItem("todos", JSON.stringify(newTask));
-        console.log(todos);
+        setTodos([...todos, newTodo]);
+        localStorage.setItem("todos", JSON.stringify([...todos, newTodo]));
         clear();
     };
 
@@ -56,7 +58,7 @@ function App() {
     };
 
     return (
-        <div className="bg-blue-200 rounded-md max-w-2xl mx-auto h-screen">
+        <div className="bg-blue-200 rounded-md max-w-2xl mx-auto">
             <header className="flex  flex-col justify-center items-center pt-2">
                 <h1 className="font-bold text-2xl"> TDooList </h1>
                 <hr className="w-full bg-white border-solid	border-white border-2 mt-2" />
@@ -110,13 +112,22 @@ function App() {
                         key={todo.title}
                     >
                         <div className="flex justify-between items-center">
-                            <h1>{todo.title}</h1>
-                            <h3>
+                            <div className="flex space-x-2 items-center">
+                                <h1 className="font-semibold text-2xl">
+                                    {todo.title}
+                                </h1>
+                                {/* <div> */}
+                                <div className="flex space-x-2 items-center">
+                                    <h2>Completed</h2>
+                                    <input type="radio" />
+                                </div>
+                            </div>
+                            <h3 className="text-gray-600">
                                 {todo.points}{" "}
                                 {todo.points === 1 ? "point" : "points"}
                             </h3>
                         </div>
-                        {/* <p>{todo.date}</p> */}
+                        <p className="text-gray-600 text-sm">{todo.date}</p>
                         <p>{todo.description}</p>
                     </div>
                 ))}
