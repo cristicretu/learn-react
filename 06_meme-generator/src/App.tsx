@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { saveAs } from "file-saver";
 import MemeCard from "./MemeCard";
 
 export interface Meme {
@@ -7,14 +8,28 @@ export interface Meme {
   url: string;
 }
 
+const objectToQueryParam = (obj: any) => {
+  const params = Object.entries(obj).map(([key, value]) => `${key}=${value}`);
+  return "?" + params.join("&");
+};
+
 function App() {
   const url = "https://api.imgflip.com/get_memes";
   const [memes, setMemes] = useState<Meme[]>([]);
-  const [selectedMeme, setSelectedMeme] = useState<Meme | null>();
+  const [selectedMeme, setSelectedMeme] = useState<Meme | null>(null);
+  const [responseMeme, setResponseMeme] = useState<string>("");
+
+  const [topText, setTopText] = useState<string>("");
+  const [bottomText, setBottomText] = useState<string>("");
+
+  const saveImage = () => {
+    saveAs(responseMeme, "image.png");
+  };
 
   const removeSetMeme = () => {
     setSelectedMeme(null);
   };
+
   useEffect(() => {
     fetch(url).then((res) =>
       res.json().then((data) => setMemes(data.data.memes))
@@ -61,6 +76,49 @@ function App() {
         alt={selectedMeme.name}
         src={selectedMeme.url}
       />
+
+      <form
+        onSubmit={async (e) => {
+          e.preventDefault();
+
+          const params = {
+            template_id: selectedMeme.id,
+            text0: topText,
+            text1: bottomText,
+            username: "contsecurizatmessi",
+            password: "bapkam-8gasjo-jeMbir",
+          };
+          const response = await fetch(
+            `https://api.imgflip.com/caption_image${objectToQueryParam(params)}`
+          );
+          const json = await response.json();
+          setResponseMeme(json.data.url);
+        }}
+        className="flex flex-col space-y-2 justify-center items-center mt-4"
+      >
+        <input
+          type="text"
+          placeholder="top text"
+          className="rounded-md text-lg px-2"
+          value={topText}
+          onChange={(e) => setTopText(e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="bottom text"
+          className="rounded-md text-lg px-2"
+          value={bottomText}
+          onChange={(e) => setBottomText(e.target.value)}
+        />
+        <button type="submit">create meme</button>
+      </form>
+      {responseMeme && (
+        <div>
+          <h1>Done!</h1>
+          <img src={responseMeme} alt={selectedMeme.name} />
+          <button onClick={saveImage}>Save image</button>
+        </div>
+      )}
     </div>
   );
 }
